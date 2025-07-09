@@ -1,10 +1,3 @@
-//
-//   Core Framework - Script file
-//
-//   @license    MIT (https://mit-license.org/)
-//   @author     Louis Ouellet <louis@laswitchtech.com>
-//
-
 const ClientModalArchive = function(client, table = null, row = null){
 
     // Create a modal
@@ -45,7 +38,7 @@ const ClientModalArchive = function(client, table = null, row = null){
 
                         // AJAX Request
                         $.ajax({
-                            url: '/endpoint.php/clients/archive?id='+client.id,
+                            url: '/api/clients/archive?id='+client.id,
                             type: 'GET',dataType: 'json',
                             success: function(response) {
 
@@ -99,22 +92,13 @@ function process_function_ClientCreate(task, value, callback = null){
         return;
     }
 
-    // Initialize the data object
-    var data = {lead: task.targetId};
-
-    // Add the CSRF token
-    data[CSRF_KEY] = CSRF_TOKEN;
-
     // AJAX Request
     $.ajax({
-        url: '/endpoint.php/clients/create',
+        url: '/api/clients/create',
+        headers: {'X-CSRF-Authorization': CSRF_KEY},
         type: 'POST',dataType: 'json',
-        data: data,
+        data: {lead: task.targetId,vcard: task.target.vcard.id},
         success: function(response) {
-
-            // Update the CSRF Token
-            CSRF_KEY = response.CSRF.key;
-            CSRF_TOKEN = response.CSRF.token;
 
             // Execute Callback
             if(typeof callback === "function"){
