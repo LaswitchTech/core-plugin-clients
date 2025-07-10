@@ -22,6 +22,11 @@
             },
             success: function(response) {
 
+                // Configure Storage
+                builder.Storage.setKey('clients:index');
+                builder.Storage.set(response);
+                console.log(builder.Storage.get())
+
                 // Set Actions
                 var actions = {
                     details:{
@@ -79,7 +84,7 @@
                                 return object.prop('outerHTML');
                             }},
                             { target: 4, visible: false, title: builder.Locale.get('Status'), name: 'status', data: 'status', render: function(data, type, row) {
-                                if(typeof row.task.process[row.task.progress] === 'undefined') {
+                                if(row.task.process === null || typeof row.task.process[row.task.progress] === "undefined") {
                                     return '<h5><span class="badge text-bg-success"><i class="me-1 bi bi-asterisk"></i>'+builder.Locale.get('New')+'</span></h5>';
                                 } else {
                                     return '<h5><span class="badge text-bg-'+row.task.process[row.task.progress].color+'"><i class="me-1 bi bi-'+row.task.process[row.task.progress].icon+'"></i>'+row.task.process[row.task.progress].name+'</span></h5>';
@@ -241,7 +246,7 @@
                         component.table._component.table.addClass('z-2');
 
                         // Add Records to Layout
-                        for(const [key, record] of Object.entries(response)){
+                        for(const [key, record] of Object.entries(builder.Storage.get('records'))){
                             layout.add(record);
                         }
                     },

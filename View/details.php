@@ -240,7 +240,7 @@
                         for(const [key, value] of Object.entries(builder.Storage.get('record:vcard'))){
                             switch(key){
                                 case 'address':
-                                    const address = builder.Storage.get('record:vcard:address') + ', ' + builder.Storage.get('record:vcard:city') + ', ' + builder.Storage.get('record:vcard:state') + ' ' + builder.Storage.get('record:vcard:zipcode') + ', ' + builder.Storage.get('record:vcard:country');
+                                    const address = builder.Storage.get('record:vcard:address') + ', ' + builder.Storage.get('record:vcard:city') + ', ' + builder.Storage.get('record:vcard:state:name') + ' ' + builder.Storage.get('record:vcard:zipcode') + ', ' + builder.Storage.get('record:vcard:country:name');
                                     component.body.row[key] = $(document.createElement('div')).addClass('col-8').appendTo(component.body.row);
                                     component.body.row[key].header = $(document.createElement('p')).addClass('fw-bold text-capitalize text-nowrap').text(builder.Locale.get(key)).appendTo(component.body.row[key]);
                                     component.body.row[key].value = $(document.createElement('p')).addClass('text-nowrap m-0').text(address).appendTo(component.body.row[key]);
@@ -432,9 +432,9 @@
                                         "role": builder.Storage.get('record:vcard:role'),
                                         "address": builder.Storage.get('record:vcard:address'),
                                         "city": builder.Storage.get('record:vcard:city'),
-                                        "state": builder.Storage.get('record:vcard:state'),
+                                        "state": builder.Storage.get('record:vcard:state:name'),
                                         "zipcode": builder.Storage.get('record:vcard:zipcode'),
-                                        "country": builder.Storage.get('record:vcard:country'),
+                                        "country": builder.Storage.get('record:vcard:country:name'),
                                         "phone": builder.Storage.get('record:vcard:phone'),
                                         "mobile": builder.Storage.get('record:vcard:mobile'),
                                         "tollfree": builder.Storage.get('record:vcard:tollfree'),
