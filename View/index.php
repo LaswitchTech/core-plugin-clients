@@ -252,7 +252,7 @@
                         component.table._component.table.addClass('z-2');
 
                         // Add Records to Layout
-                        for(const [key, record] of Object.entries(builder.Storage.get('records'))){
+                        for(const [key, record] of Object.entries(response.records)){
                             layout.add(record);
                         }
                     },
