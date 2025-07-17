@@ -471,7 +471,6 @@
                                             "locale": record.vcard.locale,
                                             "name": record.vcard.name,
                                             "title": record.vcard.title,
-                                            "role": record.vcard.role,
                                             "address": record.vcard.address,
                                             "city": record.vcard.city,
                                             "state": record.vcard.state.code,
