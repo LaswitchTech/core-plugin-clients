@@ -43,10 +43,10 @@
                             let record = await builder.Storage.get('record');
 
                             // Set a minimum height to cover the controls
-                            component.body.addClass('d-flex justify-content-start align-items-center').css('min-height','88px');
+                            component.body.addClass('d-flex justify-content-start align-items-center position-relative').css('min-height','88px');
 
                             // Controls
-                            component.body.controls = $(document.createElement('div')).addClass('position-absolute top-0 end-0 me-3 mt-5').appendTo(component.body);
+                            component.body.controls = $(document.createElement('div')).addClass('position-absolute top-0 end-0 m-3').appendTo(component.body);
 
                             // // Control - Subscriptions
                             // component.body.controls.subscription = $(document.createElement('button')).addClass('btn btn-sm btn-light me-2').attr('data-action','subscribe').attr('data-user',USER_USERNAME).text(builder.Locale.get('Subscribe')).appendTo(component.body.controls);
