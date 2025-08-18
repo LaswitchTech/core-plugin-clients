@@ -118,6 +118,7 @@ class ClientsEndpoint extends BaseEndpoint {
                     ["key" => "targetTable", "operator" => "=", "value" => $this->basename],
                     ["key" => "targetId", "operator" => "=", "value" => $message['data']['record']['id']],
                     ["key" => "isArchived", "operator" => "<>", "value" => 1],
+                    ["key" => "task.isArchived", "operator" => "<>", "value" => 1],
                 ]);
             }
 
