@@ -18,6 +18,60 @@ class ClientsModel extends BaseModel {
     }
 
     /**
+     * Initialize the Model
+     *
+     * @param string $table
+     * @param string|null $primary
+     * @return void
+     */
+    protected function init(string $table, ?string $primary = 'id'): void
+    {
+        // Call the parent init method
+        parent::init($table, $primary);
+
+        // Loop through the additional tables to join
+        foreach($this->definition as $field => $col){
+
+            // Exclude fields
+            if(in_array(strtolower($field), ['id', 'created', 'modified', 'isarchived', 'iscompleted', 'targettable', 'targetid'])) continue;
+
+            // Set the fieldTable
+            $fieldTable = in_array($field,['owner', 'assignedTo']) ? 'users' : $field . 's';
+
+            // Initialize the Schema
+            $schema = $this->Database->schema()->define($fieldTable);
+
+            // Describe the table
+            foreach($schema->describe() as $column){
+
+                // Add the column to the definition
+                $this->definition[$field.'.'.$column['Field']] = $column;
+
+                // Check if the field is a complex field
+                if(in_array(strtolower($field), ['lead', 'client'])){
+
+                    // Check if the field is a complex field
+                    if(in_array(strtolower($column['Field']), ['task'])){
+
+                        // Set the fieldTable
+                        $nestedTable = in_array($field,['owner', 'assignedTo']) ? 'users' : $field . 's';
+
+                        // Initialize the Schema
+                        $nestedSchema = $this->Database->schema()->define($nestedTable);
+
+                        // Describe the table
+                        foreach($nestedSchema->describe() as $nestedColumn){
+
+                            // Add the nestedColumn to the definition
+                            $this->definition[$field.'.'.$column['Field'].'.'.$nestedColumn['Field']] = $nestedColumn;
+                        }
+                    };
+                };
+            }
+        }
+    }
+
+    /**
      * Process a record
      *
      * @param array $record
