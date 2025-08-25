@@ -18,6 +18,60 @@ class ClientsModel extends BaseModel {
     }
 
     /**
+     * Initialize the Model
+     *
+     * @param string $table
+     * @param string|null $primary
+     * @return void
+     */
+    protected function init(string $table, ?string $primary = 'id'): void
+    {
+        // Call the parent init method
+        parent::init($table, $primary);
+
+        // Loop through the additional tables to join
+        foreach($this->definition as $field => $col){
+
+            // Exclude fields
+            if(in_array(strtolower($field), ['id', 'created', 'modified', 'isarchived', 'iscompleted', 'targettable', 'targetid'])) continue;
+
+            // Set the fieldTable
+            $fieldTable = in_array($field,['owner', 'assignedTo']) ? 'users' : $field . 's';
+
+            // Initialize the Schema
+            $schema = $this->Database->schema()->define($fieldTable);
+
+            // Describe the table
+            foreach($schema->describe() as $column){
+
+                // Add the column to the definition
+                $this->definition[$field.'.'.$column['Field']] = $column;
+
+                // Check if the field is a complex field
+                if(in_array(strtolower($field), ['lead', 'client'])){
+
+                    // Check if the field is a complex field
+                    if(in_array(strtolower($column['Field']), ['task'])){
+
+                        // Set the fieldTable
+                        $nestedTable = in_array($field,['owner', 'assignedTo']) ? 'users' : $field . 's';
+
+                        // Initialize the Schema
+                        $nestedSchema = $this->Database->schema()->define($nestedTable);
+
+                        // Describe the table
+                        foreach($nestedSchema->describe() as $nestedColumn){
+
+                            // Add the nestedColumn to the definition
+                            $this->definition[$field.'.'.$column['Field'].'.'.$nestedColumn['Field']] = $nestedColumn;
+                        }
+                    };
+                };
+            }
+        }
+    }
+
+    /**
      * Process a record
      *
      * @param array $record
@@ -60,10 +114,11 @@ class ClientsModel extends BaseModel {
             ->table($this->table)
             ->select('*')
             ->join('owner', 'users', 'username')
-            ->join('assignedTo', 'users', 'id')
             ->join('lead', 'leads', 'id')
+            ->join('lead.task', 'tasks', 'id')
             ->join('vcard', 'vcards', 'id')
             ->join('task', 'tasks', 'id')
+            ->join('task.assignedTo', 'users', 'id')
             ->join('delegation', 'delegations', 'id')
             ->join('firm', 'firms', 'id')
             ->join('organization', 'organizations', 'id')
@@ -120,8 +175,8 @@ class ClientsModel extends BaseModel {
             ->table($this->table)
             ->select('*')
             ->join('owner', 'users', 'username')
-            ->join('assignedTo', 'users', 'id')
             ->join('lead', 'leads', 'id')
+            ->join('lead.task', 'tasks', 'id')
             ->join('vcard', 'vcards', 'id')
             ->join('task', 'tasks', 'id')
             ->join('delegation', 'delegations', 'id')
@@ -129,6 +184,11 @@ class ClientsModel extends BaseModel {
             ->join('organization', 'organizations', 'id')
             ->filter()
             ->where('id', 9999, '<>')
+            ->where('organization', $this->Auth->user()->organization()->id)
+            ->where('isArchived', 1, '<>')
+            ->where('lead.isArchived', 1, '<>')
+            ->where('lead.task.isArchived', 1, '<>')
+            ->where('task.isArchived', 1, '<>')
             ->filter()
             ->where($this->primary, $id)
             ->limit(1);
