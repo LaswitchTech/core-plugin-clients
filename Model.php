@@ -86,16 +86,24 @@ class ClientsModel extends BaseModel {
         if(array_key_exists('task', $record) && !empty($record['task'])){
 
             // Process the task
-            $record['task']['process'] = json_decode($record['task']['process'] ?? "[]", true);
+            if(!is_array($record['task']['process'])){
+                $record['task']['process'] = json_decode($record['task']['process'] ?? "[]", true);
+            }
         }
 
         // Check if the record has a vcard
         if(array_key_exists('vcard', $record) && !empty($record['vcard'])){
 
             // Process the vcard
-            $record['vcard']['role'] = json_decode($record['vcard']['role'] ?? "[]", true);
-            $record['vcard']['tags'] = json_decode($record['vcard']['tags'] ?? "[]", true);
-            $record['vcard']['industries'] = json_decode($record['vcard']['industries'] ?? "[]", true);
+            if(!is_array($record['vcard']['role'])){
+                $record['vcard']['role'] = json_decode($record['vcard']['role'] ?? "[]", true);
+            }
+            if(!is_array($record['vcard']['tags'])){
+                $record['vcard']['tags'] = json_decode($record['vcard']['tags'] ?? "[]", true);
+            }
+            if(!is_array($record['vcard']['industries'])){
+                $record['vcard']['industries'] = json_decode($record['vcard']['industries'] ?? "[]", true);
+            }
         }
 
         // Return the processed record
