@@ -93,6 +93,7 @@ class ClientsModel extends BaseModel {
         if(array_key_exists('vcard', $record) && !empty($record['vcard'])){
 
             // Process the vcard
+            $record['vcard']['role'] = json_decode($record['vcard']['role'] ?? "[]", true);
             $record['vcard']['tags'] = json_decode($record['vcard']['tags'] ?? "[]", true);
             $record['vcard']['industries'] = json_decode($record['vcard']['industries'] ?? "[]", true);
         }
