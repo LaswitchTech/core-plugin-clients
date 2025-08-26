@@ -93,6 +93,7 @@ class ClientsModel extends BaseModel {
         if(array_key_exists('vcard', $record) && !empty($record['vcard'])){
 
             // Process the vcard
+            $record['vcard']['role'] = json_decode($record['vcard']['role'] ?? "[]", true);
             $record['vcard']['tags'] = json_decode($record['vcard']['tags'] ?? "[]", true);
             $record['vcard']['industries'] = json_decode($record['vcard']['industries'] ?? "[]", true);
         }
@@ -183,14 +184,20 @@ class ClientsModel extends BaseModel {
             ->join('firm', 'firms', 'id')
             ->join('organization', 'organizations', 'id')
             ->filter()
-            ->where('id', 9999, '<>')
-            ->where('organization', $this->Auth->user()->organization()->id)
-            ->where('isArchived', 1, '<>')
-            ->where('lead.isArchived', 1, '<>')
-            ->where('lead.task.isArchived', 1, '<>')
-            ->where('task.isArchived', 1, '<>')
+                ->where('id', 9999, '<>')
+                ->where('organization', $this->Auth->user()->organization()->id)
+                ->where('isArchived', 1, '<>')
             ->filter()
-            ->where($this->primary, $id)
+                ->where('lead', null, 'IS NULL')
+                ->where('lead.isArchived', 1, '<>', 'OR')
+            ->filter()
+                ->where('lead.task', null, 'IS NULL')
+                ->where('lead.task.isArchived', 1, '<>', 'OR')
+            ->filter()
+                ->where('task', null, 'IS NULL')
+                ->where('task.isArchived', 1, '<>', 'OR')
+            ->filter()
+                ->where($this->primary, $id)
             ->limit(1);
 
         // Retrieve the record
