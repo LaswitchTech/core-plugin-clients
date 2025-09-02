@@ -32,42 +32,26 @@ class ClientsModel extends BaseModel {
         // Loop through the additional tables to join
         foreach($this->definition as $field => $col){
 
-            // Exclude fields
-            if(in_array(strtolower($field), ['id', 'created', 'modified', 'isarchived', 'iscompleted', 'targettable', 'targetid'])) continue;
+            // Check if the field contains a dot
+            if(strpos($field, '.') !== false) continue;
 
-            // Set the fieldTable
-            $fieldTable = in_array($field,['owner', 'assignedTo']) ? 'users' : $field . 's';
+            // Set the table
+            $table = in_array(explode('.',$field)[1],['owner', 'assignedTo']) ? 'users' : explode('.',$field)[1] . 's';
+            $table = in_array(explode('.',$field)[1],['category']) ? 'categories' : $table;
 
-            // Initialize the Schema
-            $schema = $this->Database->schema()->define($fieldTable);
+            // Check if the field is linked to a table
+            if(in_array($table, $this->tables)){
 
-            // Describe the table
-            foreach($schema->describe() as $column){
+                // Initialize the Schema
+                $schema = $this->Database->schema()->define($table);
 
-                // Add the column to the definition
-                $this->definition[$field.'.'.$column['Field']] = $column;
+                // Describe the table
+                foreach($schema->describe() as $col){
 
-                // Check if the field is a complex field
-                if(in_array(strtolower($field), ['lead', 'client'])){
-
-                    // Check if the field is a complex field
-                    if(in_array(strtolower($column['Field']), ['task'])){
-
-                        // Set the fieldTable
-                        $nestedTable = in_array($field,['owner', 'assignedTo']) ? 'users' : $field . 's';
-
-                        // Initialize the Schema
-                        $nestedSchema = $this->Database->schema()->define($nestedTable);
-
-                        // Describe the table
-                        foreach($nestedSchema->describe() as $nestedColumn){
-
-                            // Add the nestedColumn to the definition
-                            $this->definition[$field.'.'.$column['Field'].'.'.$nestedColumn['Field']] = $nestedColumn;
-                        }
-                    };
-                };
-            }
+                    // Add the col to the definition
+                    $this->definition[$field.'.'.$col['Field']] = $col;
+                }
+            };
         }
     }
 
