@@ -37,19 +37,15 @@ const ClientModalArchive = function(client, table = null, row = null){
                         spinner.removeClass('d-none');
 
                         // AJAX Request
-                        $.ajax({
-                            url: '/api/clients/archive?id='+client.id,
-                            type: 'GET',dataType: 'json',
-                            success: function(response) {
+                        API.endpoint('/clients/archive?id='+client.id).execute(function(response){
 
-                                // Remove the item from the list
-                                if(table && row){
-                                    table.delete(row);
-                                }
-
-                                // Hide the modal
-                                modal.hide();
+                            // Remove the item from the list
+                            if(table && row){
+                                table.delete(row);
                             }
+
+                            // Hide the modal
+                            modal.hide();
                         });
                     }, 300);
                 },
@@ -93,17 +89,10 @@ function process_function_ClientCreate(task, value, callback = null){
     }
 
     // AJAX Request
-    $.ajax({
-        url: '/api/clients/create',
-        headers: {'X-CSRF-Authorization': CSRF_KEY},
-        type: 'POST',dataType: 'json',
-        data: {lead: task.targetId,vcard: task.target.vcard.id},
-        success: function(response) {
-
-            // Execute Callback
-            if(typeof callback === "function"){
-                callback(task, response);
-            }
+    API.endpoint('/clients/create').data({lead: task.targetId,vcard: task.target.vcard.id}).execute(function(response){
+        // Execute Callback
+        if(typeof callback === "function"){
+            callback(task, response);
         }
     });
 }
