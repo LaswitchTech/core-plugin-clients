@@ -41,16 +41,6 @@ class ClientsEndpoint extends BaseEndpoint {
                 $message['data']['record']['task'] = $this->Model->Tasks->fetch(intval($message['data']['record']['task']['id']));
             }
 
-            // // Check if the Delegations Plugin is accessible
-            // if($this->Helper->Core->isInstalled('delegations')){
-            //     $message['data']['record']['delegation'] = $this->Model->Delegations->fetch(intval($message['data']['record']['delegation']['id']));
-            // }
-
-            // // Check if the Firms Plugin is accessible
-            // if($this->Helper->Core->isInstalled('firms')){
-            //     $message['data']['record']['firm'] = $this->Model->Firms->fetch(intval($message['data']['record']['firm']['id']));
-            // }
-
             // Check if the Relationship Plugin is accessible
             if($this->Helper->Core->isInstalled('relationship')){
                 $message['data']['dependencies']['relationship'] = $this->Model->Relationship->get($this->basename, $message['data']['record']['id']);

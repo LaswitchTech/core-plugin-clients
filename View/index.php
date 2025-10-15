@@ -3,7 +3,7 @@
     (function () {
         $(document).ready(function(){
             builder.Layout('index',"#layout",{
-                url: '/api/clients/fetchAll',
+                endpoint: '/clients/fetchAll',
                 conditions: [
                     {key: 'isArchived', operator: '<>', value: 1},
                     {key: 'lead.isArchived', operator: '<>', value: 1},
@@ -11,7 +11,7 @@
                     {key: 'task.isArchived', operator: '<>', value: 1},
                 ],
                 dblclick: function(event, table, dt, node, data){
-                    window.location.href = "/plugin/clients/details?id=" + data.id + "&name=" + encodeURIComponent(data.vcard.name);
+                    window.location.href = "/clients/details?id=" + data.id + "&name=" + encodeURIComponent(data.vcard.name);
                 },
                 selectTools: false,
                 actions: {
@@ -19,7 +19,7 @@
                         label:'Details',
                         icon:'eye',
                         action:function(event, table, dt, node, row, data){
-                            window.location.href = "/plugin/clients/details?id=" + data.id + "&name=" + encodeURIComponent(data.vcard.name);
+                            window.location.href = "/clients/details?id=" + data.id + "&name=" + encodeURIComponent(data.vcard.name);
                         }
                     },
                     archive:{
