@@ -41,16 +41,6 @@ class ClientsEndpoint extends BaseEndpoint {
                 $message['data']['record']['task'] = $this->Model->Tasks->fetch(intval($message['data']['record']['task']['id']));
             }
 
-            // // Check if the Delegations Plugin is accessible
-            // if($this->Helper->Core->isInstalled('delegations')){
-            //     $message['data']['record']['delegation'] = $this->Model->Delegations->fetch(intval($message['data']['record']['delegation']['id']));
-            // }
-
-            // // Check if the Firms Plugin is accessible
-            // if($this->Helper->Core->isInstalled('firms')){
-            //     $message['data']['record']['firm'] = $this->Model->Firms->fetch(intval($message['data']['record']['firm']['id']));
-            // }
-
             // Check if the Relationship Plugin is accessible
             if($this->Helper->Core->isInstalled('relationship')){
                 $message['data']['dependencies']['relationship'] = $this->Model->Relationship->get($this->basename, $message['data']['record']['id']);
@@ -555,6 +545,130 @@ class ClientsEndpoint extends BaseEndpoint {
 
                 // Create the event
                 $message['data']['event'][] = $this->Model->Event->create($event);
+            }
+        }
+
+        // Return the message
+        return $message;
+    }
+
+    /**
+     * Mark a Client as Delegated
+     */
+    public function delegateAction(): array
+    {
+        // Set the default message
+        $message = ["status" => 200, "message" => "OK", "data" => []];
+
+        // Retrieve the record
+        $record = $this->Model->{$this->name}->fetch(intval($this->Request->getParams('REQUEST','id')));
+
+        // Check if the record was found
+        if(empty($record)){
+            return ["status" => 404, "message" => "Not Found", "data" => "The requested client was not found."];
+        }
+
+        // Identify the stage and task for delegation
+        $current = [
+            'stage' => 0,
+            'task' => 0,
+        ];
+        $completed = [
+            'stage' => 0,
+            'task' => 0,
+        ];
+        $task = 0;
+        foreach($record['task']['process'] as $stageKey => $stage){
+            foreach($stage['tasks'] as $taskKey => $task){
+                if($completed['task'] === 0 && !$task['isCompleted']){
+                    $completed['stage'] = $stageKey;
+                    $completed['task'] = $taskKey;
+                }
+                if($task['onComplete'] == 'process_function_ImporterIsDelegated' && $task['isDisabled']){
+                    $current['stage'] = $stageKey;
+                    $current['task'] = $taskKey;
+                }
+            }
+        }
+
+        // Check if the stage and task were found
+        if($current['stage'] === 0 && $current['task'] === 0){
+            return ["status" => 400, "message" => "Bad Request", "data" => "The client process is not configured for delegation."];
+        }
+
+        // Check if the progress is set to the correct stage
+        if($completed['stage'] < $current['stage']){
+            return ["status" => 400, "message" => "Bad Request", "data" => "The client is not ready to be delegated."];
+        }
+        if($completed['stage'] > $current['stage']){
+            return ["status" => 400, "message" => "Bad Request", "data" => "The client has already progressed beyond the delegation stage."];
+        }
+
+        // Check if the task is set to the correct task
+        if($completed['task'] < $current['task']){
+            return ["status" => 400, "message" => "Bad Request", "data" => "The client is not ready to be delegated."];
+        }
+        if($completed['task'] > $current['task']){
+            return ["status" => 400, "message" => "Bad Request", "data" => "The client has already progressed beyond the delegation task."];
+        }
+
+        // Check if the client is already delegated
+        if($record['task']['process'][$current['stage']]['isCompleted'] || $record['task']['process'][$current['stage']]['tasks'][$current['task']]['isCompleted']){
+            return ["status" => 400, "message" => "Bad Request", "data" => "The client is already delegated."];
+        }
+
+        // Check if the record is accessible
+        if($message['status'] == 200){
+
+            // Check if the Tasks Plugin is accessible
+            if($this->Helper->Core->isInstalled('tasks')){
+
+                // Mark the client as delegated
+                $record['task']['process'][$current['stage']]['tasks'][$current['task']]['isCompleted'] = true;
+
+                // Update the task
+                $affectedRows = $this->Model->Tasks->update($record['task']['id'], ['process' => $record['task']['process']]);
+
+                // Check if we successfully updated the task
+                if($affectedRows){
+
+                    // Updated the record
+                    $affectedRows = $this->Model->{$this->name}->update($record['id'], ['isDelegated' => 1, 'delegatedOn' => date('Y-m-d H:i:s')]);
+
+                    // Check if we successfully updated the record
+                    if($affectedRows){
+
+                        // Set the record
+                        $message['data']['record'] = $this->Model->{$this->name}->fetch($record['id']);
+
+                        // Check if the Event Plugin is accessible
+                        if($this->Helper->Core->isInstalled('event')){
+
+                            // Initialize the Events
+                            $message['data']['event'] = [];
+
+                            // Setup a new event
+                            $event = [
+                                'category' => 'Client',
+                                'message' => 'Client Delegated for <vcard>'.$message['data']['record']['vcard']['id'].':'.$message['data']['record']['vcard']['name'].'</vcard>',
+                                'icon' => 'circle',
+                                'color' => 'secondary',
+                                'link' => '/clients/details?id='.$message['data']['record']['id'].'&name='.urlencode($message['data']['record']['vcard']['name']),
+                                'targetTable' => 'clients',
+                                'targetId' => $message['data']['record']['id'],
+                            ];
+
+                            // Create the event
+                            $message['data']['event'][] = $this->Model->Event->create($event);
+                        }
+                    } else {
+                        $message = ["status" => 500, "message" => "We could not update the client record.", "data" => ['record' => $record]];
+                    }
+                } else {
+                    $message = ["status" => 500, "message" => "We could not update the client task.", "data" => ['record' => $record]];
+                }
+            } else {
+                $message = ["status" => 500, "message" => "The Tasks Plugin is not installed.", "data" => []];
             }
         }
 

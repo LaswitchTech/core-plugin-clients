@@ -1,74 +1,3 @@
-const ClientModalArchive = function(client, table = null, row = null){
-
-    // Create a modal
-    builder.Component(
-        "modal",
-        null,
-        {
-            onEnter: false,
-            destroy: true,
-            icon: "archive",
-            title: builder.Locale.get("Are you sure you?"),
-            body: builder.Locale.get("Your are about to archive this client. Are you sure you want to continue?"),
-            cancel: false,
-            submit: true,
-            callback: {
-                submit: function(element,modal){
-
-                    // Create a spinner animate-rotate
-                    var spinner = $(document.createElement('div')).attr({
-                        "class": "animate-rotate rounded-circle border border-secondary border-4 d-none",
-                        "style": "width: 96px; height: 96px; border-top-color: var(--bs-primary)!important;",
-                    }).appendTo(element);
-
-                    // Hide the dialog
-                    element.dialog.addClass('opacity-0');
-
-                    // Setup a spinner while waiting for the modal to be submitted
-                    setTimeout(() => {
-
-                        // Hide the dialog
-                        element.dialog.hide();
-
-                        // Add flex to the modal
-                        element.addClass('d-flex align-items-center justify-content-center');
-
-                        // Show the spinner
-                        spinner.removeClass('d-none');
-
-                        // AJAX Request
-                        API.endpoint('/clients/archive?id='+client.id).execute(function(response){
-
-                            // Remove the item from the list
-                            if(table && row){
-                                table.delete(row);
-                            }
-
-                            // Hide the modal
-                            modal.hide();
-                        });
-                    }, 300);
-                },
-            },
-        },
-        function(modal,component){
-
-            // Save the component
-            const componentModal = component;
-
-            // Style the modal
-            component.addClass('modal-dark');
-            component.footer.submit.addClass('btn-dark').removeClass('btn-link').attr({
-                "style": "border-bottom-right-radius: var(--bs-modal-inner-border-radius) !important;border-bottom-left-radius: var(--bs-modal-inner-border-radius) !important;",
-            }).text(builder.Locale.get('Archive'));
-            component.footer.submit.icon = $(document.createElement('i')).addClass('bi bi-archive me-1').prependTo(component.footer.submit);
-
-            // Open the modal
-            modal.show();
-        },
-    );
-};
-
 // Create a client
 function process_function_ClientCreate(task, value, callback = null){
 
@@ -100,6 +29,93 @@ function process_meta_ClientCreate(key = null){
     const metadata = {
         label: "Create a Client Profile",
         description: "Create a Client Profile from a Lead",
+        type: "none",
+    };
+    return metadata[key] ? metadata[key] : metadata;
+}
+
+// Verify if the client is Allocated
+function process_function_ClientIsAllocated(task, value, callback = null){
+
+    // Check if the target is loaded
+    if(task.target === 'undefined'){
+        return;
+    }
+
+    // Initialize clientID
+    var clientID = null;
+
+    // Handle different target tables
+    switch(task.targetTable){
+        case 'clients':
+            clientID = task.targetId;
+            break;
+        case 'leads':
+            clientID = task.target.client.id;
+            break;
+        default:
+            return;
+    }
+
+    // AJAX Request
+    API.endpoint('/clients/fetch?id='+clientID).execute(function(response, endpoint){
+
+        // Check if the Client is Allocated
+        if(response.record.task.assignedTo.id !== null){
+
+            // Execute Callback
+            if(typeof callback === "function"){
+                callback(task, response);
+            }
+        }
+    });
+}
+function process_meta_ClientIsAllocated(key = null){
+    const metadata = {
+        label: "Is Client Allocated?",
+        description: "Check if the Client is Allocated",
+        type: "none",
+    };
+    return metadata[key] ? metadata[key] : metadata;
+}
+
+// Mark as Delegated
+function process_function_DelegateClient(task, value, callback = null){
+
+    // Check if the target is loaded
+    if(task.target === 'undefined'){
+        return;
+    }
+
+    // Initialize clientID
+    var clientID = null;
+
+    // Handle different target tables
+    switch(task.targetTable){
+        case 'clients':
+            clientID = task.targetId;
+            break;
+        case 'importers':
+        case 'leads':
+            clientID = task.target.client.id;
+            break;
+        default:
+            return;
+    }
+
+    // AJAX Request
+    API.endpoint('/client/delegate').data({id: clientID}).suppress().execute(function(response, endpoint){
+
+        // Execute Callback
+        if(typeof callback === "function"){
+            callback(task, response);
+        }
+    });
+}
+function process_meta_DelegateClient(key = null){
+    const metadata = {
+        label: "Mark Client as delegated",
+        description: "Mark a Client as delegated",
         type: "none",
     };
     return metadata[key] ? metadata[key] : metadata;

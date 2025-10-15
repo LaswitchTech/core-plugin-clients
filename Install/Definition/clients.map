@@ -32,7 +32,7 @@
         "Extra": ""
     },
     "4": {
-        "Field": "assignedTo",
+        "Field": "lead",
         "Type": "bigint(20)",
         "Null": "YES",
         "Key": "",
@@ -40,7 +40,7 @@
         "Extra": ""
     },
     "5": {
-        "Field": "lead",
+        "Field": "importer",
         "Type": "bigint(20)",
         "Null": "YES",
         "Key": "",
@@ -64,16 +64,16 @@
         "Extra": ""
     },
     "8": {
-        "Field": "delegation",
-        "Type": "bigint(20)",
-        "Null": "YES",
+        "Field": "isDelegated",
+        "Type": "int(1)",
+        "Null": "NO",
         "Key": "",
-        "Default": null,
+        "Default": "0",
         "Extra": ""
     },
     "9": {
-        "Field": "firm",
-        "Type": "bigint(20)",
+        "Field": "delegatedOn",
+        "Type": "datetime",
         "Null": "YES",
         "Key": "",
         "Default": null,

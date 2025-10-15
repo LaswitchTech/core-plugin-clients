@@ -2,13 +2,14 @@
     {
         "id": 9999,
         "created": "2025-04-07 15:10:37",
-        "modified": "2025-04-07 15:10:37",
+        "modified": "2025-10-15 11:09:33",
         "owner": "demo",
-        "assignedTo": null,
         "lead": null,
+        "importer": null,
         "vcard": null,
         "task": null,
-        "delegation": null,
+        "isDelegated": 0,
+        "delegatedOn": null,
         "organization": null,
         "isArchived": 0
     }
