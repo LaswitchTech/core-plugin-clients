@@ -109,6 +109,8 @@ class ClientsModel extends BaseModel {
             ->join('owner', 'users', 'username')
             ->join('lead', 'leads', 'id')
             ->join('lead.task', 'tasks', 'id')
+            ->join('importer', 'importers', 'id')
+            ->join('importer.task', 'tasks', 'id')
             ->join('vcard', 'vcards', 'id')
             ->join('task', 'tasks', 'id')
             ->join('task.assignedTo', 'users', 'id')
