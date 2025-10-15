@@ -33,3 +33,90 @@ function process_meta_ClientCreate(key = null){
     };
     return metadata[key] ? metadata[key] : metadata;
 }
+
+// Verify if the client is Allocated
+function process_function_ClientIsAllocated(task, value, callback = null){
+
+    // Check if the target is loaded
+    if(task.target === 'undefined'){
+        return;
+    }
+
+    // Initialize clientID
+    var clientID = null;
+
+    // Handle different target tables
+    switch(task.targetTable){
+        case 'clients':
+            clientID = task.targetId;
+            break;
+        case 'leads':
+            clientID = task.target.client.id;
+            break;
+        default:
+            return;
+    }
+
+    // AJAX Request
+    API.endpoint('/clients/fetch?id='+clientID).execute(function(response, endpoint){
+
+        // Check if the Client is Allocated
+        if(response.record.task.assignedTo.id !== null){
+
+            // Execute Callback
+            if(typeof callback === "function"){
+                callback(task, response);
+            }
+        }
+    });
+}
+function process_meta_ClientIsAllocated(key = null){
+    const metadata = {
+        label: "Is Client Allocated?",
+        description: "Check if the Client is Allocated",
+        type: "none",
+    };
+    return metadata[key] ? metadata[key] : metadata;
+}
+
+// Mark as Delegated
+function process_function_DelegateClient(task, value, callback = null){
+
+    // Check if the target is loaded
+    if(task.target === 'undefined'){
+        return;
+    }
+
+    // Initialize clientID
+    var clientID = null;
+
+    // Handle different target tables
+    switch(task.targetTable){
+        case 'clients':
+            clientID = task.targetId;
+            break;
+        case 'importers':
+        case 'leads':
+            clientID = task.target.client.id;
+            break;
+        default:
+            return;
+    }
+
+    // AJAX Request
+    API.endpoint('/client/delegate').data({id: clientID}).suppress().execute(function(response, endpoint){
+
+        // Execute Callback
+        if(typeof callback === "function"){
+            callback(task, response);
+        }
+    });
+}
+function process_meta_DelegateClient(key = null){
+    const metadata = {
+        label: "Mark Client as delegated",
+        description: "Mark a Client as delegated",
+        type: "none",
+    };
+    return metadata[key] ? metadata[key] : metadata;
+}
