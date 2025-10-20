@@ -20,6 +20,7 @@ class ClientsPostModel extends ClientsModel {
 
             // Handle specific fields
             switch($key){
+                case 'delegation':
                 case 'assignedTo':
                     unset($record[$key]);
                     break;
