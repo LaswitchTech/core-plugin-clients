@@ -104,7 +104,7 @@ function process_function_DelegateClient(task, value, callback = null){
     }
 
     // AJAX Request
-    API.endpoint('/client/delegate').data({id: clientID}).suppress().execute(function(response, endpoint){
+    API.endpoint('/clients/delegate').data({id: clientID}).suppress().execute(function(response, endpoint){
 
         // Execute Callback
         if(typeof callback === "function"){
