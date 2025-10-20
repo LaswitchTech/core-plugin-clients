@@ -591,7 +591,7 @@ class ClientsEndpoint extends BaseEndpoint {
                     $completed['stage'] = $stageKey;
                     $completed['task'] = $taskKey;
                 }
-                if($task['onComplete'] == 'process_function_ImporterIsDelegated' && $task['isDisabled']){
+                if($task['onComplete'] == 'process_function_ClientIsDelegated' && $task['isDisabled']){
                     $current['stage'] = $stageKey;
                     $current['task'] = $taskKey;
                 }
