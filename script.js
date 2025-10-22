@@ -57,18 +57,22 @@ function process_function_ClientIsAllocated(task, value, callback = null){
             return;
     }
 
-    // AJAX Request
-    API.endpoint('/clients/fetch?id='+clientID).execute(function(response, endpoint){
+    // Check if clientID is valid
+    if(clientID){
 
-        // Check if the Client is Allocated
-        if(response.record.task.assignedTo.id !== null){
+        // AJAX Request
+        API.endpoint('/clients/fetch?id='+clientID).execute(function(response, endpoint){
 
-            // Execute Callback
-            if(typeof callback === "function"){
-                callback(task, response);
+            // Check if the Client is Allocated
+            if(response.record.task.assignedTo.id !== null){
+
+                // Execute Callback
+                if(typeof callback === "function"){
+                    callback(task, response);
+                }
             }
-        }
-    });
+        });
+    }
 }
 function process_meta_ClientIsAllocated(key = null){
     const metadata = {
