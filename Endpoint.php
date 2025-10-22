@@ -190,7 +190,7 @@ class ClientsEndpoint extends BaseEndpoint {
             if($this->Helper->Core->isInstalled('leads')){
 
                 // Add the client to the lead
-                $this->Model->Leads->update($message['data']['record']['lead']['id'],['client' => $message['data']['record']['id']]);
+                $this->Model->Leads->update($parameters['lead'],['client' => $message['data']['record']['id']]);
             }
 
             // Check if the Tasks Plugin is accessible
