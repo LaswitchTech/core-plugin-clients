@@ -6,8 +6,6 @@
                 endpoint: '/clients/fetchAll',
                 conditions: [
                     {key: 'isArchived', operator: '<>', value: 1},
-                    {key: 'lead.isArchived', operator: '<>', value: 1},
-                    {key: 'lead.task.isArchived', operator: '<>', value: 1},
                     {key: 'task.isArchived', operator: '<>', value: 1},
                 ],
                 dblclick: function(event, table, dt, node, data){
