@@ -250,7 +250,7 @@ class ClientsEndpoint extends BaseEndpoint {
                 // Create the relationship with the lead
                 $this->Model->Relationship->create(
                     'leads',
-                    $message['data']['record']['lead']['id'],
+                    $parameters['lead'],
                     $this->basename,
                     $message['data']['record']['id'],
                 );
@@ -258,7 +258,7 @@ class ClientsEndpoint extends BaseEndpoint {
                     $this->basename,
                     $message['data']['record']['id'],
                     'leads',
-                    $message['data']['record']['lead']['id'],
+                    $parameters['lead'],
                 );
             }
 
