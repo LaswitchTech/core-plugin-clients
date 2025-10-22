@@ -3,11 +3,9 @@
     (function () {
         $(document).ready(function(){
             builder.Layout('index',"#layout",{
-                url: '/api/clients/fetchAll',
+                endpoint: '/clients/fetchAll',
                 conditions: [
                     {key: 'isArchived', operator: '<>', value: 1},
-                    {key: 'lead.isArchived', operator: '<>', value: 1},
-                    {key: 'lead.task.isArchived', operator: '<>', value: 1},
                     {key: 'task.isArchived', operator: '<>', value: 1},
                     {key: 'task.assignedTo', operator: '=', value: USER_ID},
                 ],
